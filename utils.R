@@ -58,13 +58,14 @@
     palabras[, r := rank(n.total) / nrow(palabras)]
     
      # resumen para las fotos en Mathematica
-      file.nome <- paste0("datos/", as.character(Sys.Date(), "%Y%m%d"), "_", nrow(dt.fakes), ".csv")
+      session <- paste0(as.character(Sys.Date(), "%Y%m%d"), "_", nrow(dt.fakes))
+      file.nome <- paste0("datos/", session, ".csv")
       write.csv(libros %>% select(-texto),
                 file.nome, 
                 row.names = F)
       print(paste0('**Guardando fichero para Mathematica: ', file.nome))
     
-    return(list(fakes = dt.fakes, diccionario = palabras))
+    return(list(fakes = dt.fakes, diccionario = palabras, session.id = session))
   }
   
   # El guardado en fichero, palabras y ranking
@@ -88,19 +89,19 @@
 # RESTO -------------------------------------------------------------------
 
 
-get.libro.list <- function(ruta){
-    # ruta <- rutas$path[3]
-    ruta.partes <- strsplit(ruta, "(/|\\.txt)")[[1]] %>% rev
-    path      <- paste0(rev(ruta.partes)[2:(length(ruta.partes)-1)], collapse = "/")
-    autor     <- ruta.partes[3]
-    titulo    <- stringi::stri_replace(ruta.partes[2], replacement = "", regex = " \\(\\d+\\)$")
-    txt.total <- read_file(ruta)
-    res <- list(titulo = titulo,
-                autor  = autor,
-                texto  = txt.total, 
-                path   = path)
-    return(res)
-  }
+ get.libro.list <- function(ruta){
+   # ruta <- rutas$path[3]
+   ruta.partes <- strsplit(ruta, "(/|\\.txt)")[[1]] %>% rev
+   path      <- paste0(rev(ruta.partes)[2:(length(ruta.partes)-1)], collapse = "/")
+   autor     <- ruta.partes[3]
+   titulo    <- stringi::stri_replace(ruta.partes[2], replacement = "", regex = " \\(\\d+\\)$")
+   txt.total <- read_file(ruta)
+   res <- list(titulo = titulo,
+               autor  = autor,
+               texto  = txt.total, 
+               path   = path)
+   return(res)
+ }
   
   get.libro.dt <- function(ruta){
     return(get.libro.list(ruta) %>% as.data.table())
@@ -115,7 +116,7 @@ get.libro.list <- function(ruta){
           collapse = " ")
   }
 
-  crea.capsulas <- function(dt.partes) {
+  crea.capsulas <- function(dt.partes, n.libro) {
     dt.partes$grupo <- 0
     i <- 1
     while (nrow(dt.partes[grupo == 0]) > 0) {
@@ -153,3 +154,23 @@ get.libro.list <- function(ruta){
     
     return(aver)
   }
+  
+  mathematica.remove.covers <- function(){
+    unlink("MATHEMATICA/*")
+  }
+  
+  str_standar <- function(x){
+    iconv(x, to = 'ASCII//TRANSLIT') %>% stringr::str_replace_all(' ', '_')
+  }
+      
+  get.partes <- function(libro){
+    dt.partes <- data.table(txt = strsplit(stringr::str_replace_all(libro$texto, "\t", ""),
+                                           "\r\n")[[1]])
+    dt.partes[, ':='(
+      letras  = stringi::stri_length(txt),
+      preview = strtrim(txt, 100),
+      id      = 1:.N)]
+    
+    return(dt.partes[letras > 0])
+  }
+  

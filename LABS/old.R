@@ -212,3 +212,60 @@
     dir.old <- paste0(path, ruta)
     file.copy(dir.old, dir.new, recursive = T)
   }
+  
+  # REPAIR ------------------------------------------------------------------
+
+  # dt.fakes[listo==T] %>% select(-texto)
+  # 
+  # #veamos cuales tienen 816 y los borramos y ponemos en listo = F
+  # libros.sum <- con.libros.sum$find() %>% as.data.table
+  # ids.malos <- libros.sum[nCapitulos==861]$libroId
+  # borra.libros(ids.malos)
+  # 
+  # dt.fakes[, listo:=F]
+  # dt.fakes[titulo=="Cerebro", listo:=T]
+  
+# borrar ------------------------------------------------------------------
+
+# dt.fakes <- readRDS("datos/20180327_22.RDS")
+  # preparamos para poner el número de capitulos de cada uno de ellos.
+
+  #  dt.summary <- data.table(fakeAuthor = "aa", 
+  #                          fakeTitle = "aa",
+  #                          nCapitulos = 999, 
+  #                          author = "aa",
+  #                          title = "aa",
+  #                          libroId = 99,
+  #                          idioma = "lang",
+  #                          createdAt = Sys.time(),
+  #                          updatedAt = Sys.time()
+  #                          )
+  # 
+  # con.libros.sum$insert(dt.summary)
+#   
+#   #borramos los libros del sum
+#   
+#    q <- paste0('{"title" : {"$in" :["', lista(dt.fakes$titulo, T),'"]}}')
+#    q <- paste0('{"title" : {"$in" :["', lista("aa", T),'"]}}')
+#      cat(q)
+#      a <- con.libros.sum$find(q)
+#   
+#   # Contamos los capitulos para cada uno de ellos:
+#      ids <- a$libroId
+#      id <- ids[1]
+#      q <- paste0('{"nLibro" : {"$in" :[', id,']}}')
+#      cat(q)
+#     con.libros$count(q)
+#      
+#     ns <- lapply(ids, function(id){con.libros$count(paste0('{"nLibro" : {"$in" :[', id,']}}'))})
+#     
+#     dt.fakes$id <- NULL
+#     
+#     dt.rows <- data.table(libroId = ids, nCapitulosOk = unlist(ns))
+#     
+#     me <- merge(a, dt.rows) %>% as.data.table
+#     me[, nCapitulos := nCapitulosOk]
+#     
+#     # write.csv(me %>% select(-nCapitulosOk),paste0("datos/Repair_nrows", ".csv"), row.names = F)
+#     
+# me %>% str

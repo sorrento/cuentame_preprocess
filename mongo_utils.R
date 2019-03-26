@@ -7,8 +7,8 @@
 
 # Conectar ----------------------------------------------------------------
   
-  m.conectar <- function(){
-    url.cuentame   <- "mongodb://mhalat:xxxx@ds135798.mlab.com:35798/cuentame"
+  m.conectar <- function(pass){
+    url.cuentame   <- paste0("mongodb://mhalat:", pass, "@ds135798.mlab.com:35798/cuentame")
     con.libros     <- mongo(collection = "libros", url = url.cuentame)
     con.libros.sum <- mongo(collection = "librosSum", url = url.cuentame)
     
@@ -18,77 +18,71 @@
   } 
 
 
-  m.ids.libres <- function(){
-    #small change
+  get.free.ids <- function(con) {
+    libros.sum     <- as.data.table(con$summary$find())
+    ids.subidos    <- libros.sum[!is.na(libroId), libroId] %>% sort
+    ids.candidatos <- setdiff(seq(min(ids.subidos), max(ids.subidos) + 40), ids.subidos)
     
+    return(ids.candidatos)
   }
-
-# Libros online -----------------------------------------------------------
-  libros.sum <- con.libros.sum$find() %>% as.data.table
-  libros.sum[!is.na(libroId), .(title, libroId)][order(libroId)] # libroid==NA es letras de canciones
-  libros.sum[is.na(libroId)]
   
-  n.borrar <- c(5,7,14,17,22,30,53)
-  n.borrar <- c(5)
-
- 
-  # n.libro <- max(libros.sum$libroId, na.rm = T) + 1
+  m.show.books <- function(con) {
+    as.data.table(con$summary$find())[!is.na(libroId), .(libroId, fakeTitle, title, author)][order(libroId)] %>% 
+      View
+  }
+  
+  m.borra.libros <- function(con, ids){
+    # de summary
+      q <- paste0('{"libroId" : {"$in" :[', lista(ids),']}}')
+      con$summary$remove(q)
+    
+    # texto
+      q <- paste0('{"nLibro" : {"$in" :[', lista(ids),']}}')
+      con$texto$remove(q)
+  }
+  
+  # se prepara una cuero u luego se aplica con "remove"
+  lista <- function(x, texto = F){
+    
+    ch <- ifelse(texto == T, "\",\"", ",")
+    paste0(x, collapse = ch)
+  }
+  
+# Libros online -----------------------------------------------------------
+   # n.libro <- max(libros.sum$libroId, na.rm = T) + 1
   # ruta.partes <- strsplit(ruta, "(/| - |\\.txt)")[[1]] %>% rev
   # autor <- ruta.partes[1];titulo <- ruta.partes[2]
   # txt.total <- read_file(ruta)
 
-# Borrado de libros -------------------------------------------------------
-  
-  borra.libros <- function(ids){
-  # de summary
-    q <- paste0('{"libroId" : {"$in" :[',lista(ids),']}}')
-    # cat(q)
-    # a <- con.libros.sum$find(q)
-    con.libros.sum$remove(q)
-    
-  # texto
-    q <- paste0('{"nLibro" : {"$in" :[',lista(ids),']}}')
-    # cat(q)
-    # a <- con.libros$find(q, limit = 7)
-    con.libros$remove(q)
-  }
-  # se prepara una cuero u luego se aplica con "remove"
-    lista <- function(x, texto =F){
-      
-      ch <- ifelse(texto==T, "\",\"", ",")
-      paste0(x, collapse = ch)
-    }
-   # lista(n.borrar)
-    # borra.libros(lista(115))
-  
+
 # Libros que están mal ----------------------------------------------------
 
-  out <- con$find('{"nCapitulo" : "8"}')
-  out <- out %>% select(-texto)
-  nlibros.bad <- out$nLibro
+  # out <- con$find('{"nCapitulo" : "8"}')
+  # out <- out %>% select(-texto)
+  # nlibros.bad <- out$nLibro
 
 # reparar ----------------------------------------------------------------
 
-   ids.reparar <- nlibros.bad
-  
-  for(i in ids.reparar){
-    print(paste("reparando", i))
-    
-    i <- 151
-    query <- paste0('{"nLibro" : ', i,'}')
-    l.38 <- con.libros$find(query) %>% as.data.table
-    
-    # lo borramos online
-    con$remove(query)
-    
-    # reparamos
-    
-    l.38 <- l.38[, nCapitulo := as.numeric(nCapitulo)]
-    # l.38 %>% str
-    
-    # lo subimos
-    con$insert(l.38)
-  }
+  #  ids.reparar <- nlibros.bad
+  # 
+  # for(i in ids.reparar){
+  #   print(paste("reparando", i))
+  #   
+  #   i <- 151
+  #   query <- paste0('{"nLibro" : ', i,'}')
+  #   l.38 <- con.libros$find(query) %>% as.data.table
+  #   
+  #   # lo borramos online
+  #   con$remove(query)
+  #   
+  #   # reparamos
+  #   
+  #   l.38 <- l.38[, nCapitulo := as.numeric(nCapitulo)]
+  #   # l.38 %>% str
+  #   
+  #   # lo subimos
+  #   con$insert(l.38)
+  # }
   
 
 # tips MONGODB ------------------------------------------------------------

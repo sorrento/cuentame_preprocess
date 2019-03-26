@@ -3,6 +3,8 @@
   # fichero de config con las constraseñas y similares
   # GUardar diccionario en inglés
   # empaquetar las imagenes para Mathematica
+  # hacer retomable el proceso 
+  #en diccionario, hacer relativo los números (dividir por el máximo)
 
 # LIBRERIAS -------------------------------------------------------------------
 
@@ -23,17 +25,18 @@
   
 # INIT --------------------------------------------------------------------
 
-  con <- m.conectar()
-  
-  # i.id <- 1 # qué id libre vamos a usar
-  # dt.summaries <- data.table()
-
+  con <- m.conectar('spidey')
+  dt.summaries <- data.table()
+  mathematica.remove.covers()
+  i.id <- 1
   # Rutas de los txts de la fecha más reciente
     rutas <- seleccion.txts(path.calibre)
 
 # BOOK SUMMARY ------------------------------------------------------------
 
   dt.analisis <- get.fakes(rutas$path)
+   # fecha_número de libros
+      session.id <- dt.analisis$session.id
 
   quitar <- c(6, 14, 15) # ids de los libros que no queremos incorporar
   
@@ -43,57 +46,60 @@
   # actualizamos el fichero de diccionario
     actualizar.diccionario(palabras)
   
-  # fecha_número de libros
-  session.id <- paste0(as.character(Sys.Date(), "%Y%m%d"), "_", nrow(dt.fakes))
-   # saveRDS(dt.fakes %>% select(-texto), 
+  # saveRDS(dt.fakes %>% select(-texto), 
            # paste0("datos/", session.id, ".RDS"))
+
+  rm(quitar, palabras)
+  
+# BORRADO DE LIBROS ONLINE ------------------------------------------------
+  
+  m.show.books(con)
+  
+  borrar <- c(24) # ids
+  m.borra.libros(con, borrar)
     
+  rm(borrar)
+  
+  ids.candidatos <- get.free.ids(con)
+    
+  if(!exists('dt.fakes')){
+    print('**ERROR no está cargado del fichero de sumary (dt.fakes)')
+  }
 # AUTO DIVISION FULL----------------------------------------------------------------
   
-  # id para subir
-    cat("\14")
-    libros.sum <-  con.libros.sum$find() %>% as.data.table
-    ids.subidos <- libros.sum[!is.na(libroId), libroId] %>% sort
-    (ids.candidatos <- setdiff(seq(min(ids.subidos), max(ids.subidos) + 31), ids.subidos))
-    n.libro <- ids.candidatos[i.id]
-
+  cat('\14')
+  id.free <- ids.candidatos[i.id]
+  
   # selección de libro
     print(paste("queda por procesar", dt.fakes[listo == F] %>% nrow))
     libro <- dt.fakes[listo == F] %>% sample_n(1)
-     # libro <- dt.fakes[autor=="George R. R. Martin"]
-    print(paste("vamos con:", libro$titulo, "| id_libro = ", n.libro))
+    print(paste("vamos con:", libro$titulo, "| id_libro = ", id.free))
 
-  dt.partes <- data.table(txt = strsplit(stringr::str_replace_all(libro$texto, "\t", ""),
-                                         "\r\n")[[1]])
-  # dt.partes <- data.table(txt = strsplit(libro$texto, "\r\n")[[1]])
-  dt.partes[, ':='(letras = stringi::stri_length(txt),
-                   preview = strtrim(txt, 100),
-                   id = 1:.N)]
-  dt.partes <- dt.partes[letras > 0]
-  
+    dt.partes <- get.partes(libro)
+
 # CABEZA Y COLA ------------------------------------------------------------------
 
-  dt.partes[,.(id, preview)] %>% head(71) %>% as.data.frame
-  dt.partes[,.(id, preview)] %>% tail(55) %>% as.data.frame
+  dt.partes[,.(id, preview)] %>% head(39) %>% as.data.frame
+  dt.partes[,.(id, preview)] %>% tail(50) %>% as.data.frame
   
 # AUTO CAPSULAS & INSERT --------------------------------------------------------------
   
-  mini <- 7; maxi <- 1168 #es el id
+  mini <- 40; maxi <- 1378 #es el id
   
-  capsulas <- crea.capsulas(dt.partes[id >= mini & id <= maxi])
+  capsulas <- crea.capsulas(dt.partes[id >= mini & id <= maxi], id.free)
   # capsulas[,.(nCapitulo, letras, preview)]
   # capsulas[letras >2000] %>% sample_n(1)
   
-  dt <- capsulas %>% select(-preview,-letras,-grupo)
+  dt <- capsulas %>% select(-preview, -letras, -grupo)
   
-  con.libros$insert(dt)
+  con$texto$insert(dt)
   # ESTO HACERLO EN MATHEMATICA PARA PODER INCLUIR LA FOTO
   dt.summary <- data.table(fakeAuthor = libro$fake.autor,
                            fakeTitle  = libro$fake.titulo,
                            nCapitulos = nrow(capsulas),
                            author     = libro$autor,
                            title      = libro$titulo,
-                           libroId    = n.libro,
+                           libroId    = id.free,
                            idioma     = lang
   )
   
@@ -101,79 +107,31 @@
   
   # con.libros.sum$insert(dt.summary)
 
-  dt.fakes[titulo == libro$titulo, listo := T] #<<<<<<agregar el id asignado a cada libro
+  dt.fakes[titulo == libro$titulo, listo := T]
+  # i.id <- i.id + 1
+  
+  # la foto
+    pic.name <- paste0(id.free, '_', str_standar(libro$titulo), '.jpg')
+    file.copy(file.path('c:/', libro$path, 'cover.jpg'), 'MATHEMATICA')
+    file.rename('MATHEMATICA/cover.jpg', paste0('MATHEMATICA/', pic.name))
+  
+  rm(pic.name, dt.summary, dt, capsulas, mini, maxi, libro, dt.partes) 
+  
   i.id <- i.id + 1
-
-# PARA SUMMARY MATHEMATICA ------------------------------------------------
+  
+# FINALLY, PARA SUMMARY MATHEMATICA ------------------------------------------------
   
   write.csv(dt.summaries[,.(libroId, fakeAuthor, fakeTitle, nCapitulos, author, title, idioma)], 
-            paste0("datos/summaries_" ,".csv"), row.names = F)
+            paste0("MATHEMATICA/summaries.csv"), row.names = F)
   
-# UPDATE BIBLITECA --------------------------------------------------------
+# UPDATE BIBLIOTECA --------------------------------------------------------
 
   dt.biblio <- readRDS("datos/dt.biblioteca.RDS")
   # veamos si hacen match
   # algunos estan dos veces, otros no estan
-  (a <- dt.biblio[titulo %in% dt.fakes$titulo])
+  # (a <- dt.biblio[titulo %in% dt.fakes$titulo])
   dt.biblio[titulo %in% dt.fakes$titulo, leido := 1] # marcamos los duplicados
   
-  setdiff(dt.fakes$titulo, dt.biblio$titulo) # estos ha cambiado el nombre porqe tiene guion, pero ya estan marcaos
-  dt.fakes %>% select(-texto)
+  # setdiff(dt.fakes$titulo, dt.biblio$titulo) # estos ha cambiado el nombre porqe tiene guion, pero ya estan marcaos
   
   # saveRDS(dt.biblio, "datos/dt.biblioteca.RDS")
-# REPAIR ------------------------------------------------------------------
-
-  # dt.fakes[listo==T] %>% select(-texto)
-  # 
-  # #veamos cuales tienen 816 y los borramos y ponemos en listo = F
-  # libros.sum <- con.libros.sum$find() %>% as.data.table
-  # ids.malos <- libros.sum[nCapitulos==861]$libroId
-  # borra.libros(ids.malos)
-  # 
-  # dt.fakes[, listo:=F]
-  # dt.fakes[titulo=="Cerebro", listo:=T]
-  
-# borrar ------------------------------------------------------------------
-
-# dt.fakes <- readRDS("datos/20180327_22.RDS")
-  # preparamos para poner el número de capitulos de cada uno de ellos.
-
-  #  dt.summary <- data.table(fakeAuthor = "aa", 
-  #                          fakeTitle = "aa",
-  #                          nCapitulos = 999, 
-  #                          author = "aa",
-  #                          title = "aa",
-  #                          libroId = 99,
-  #                          idioma = "lang",
-  #                          createdAt = Sys.time(),
-  #                          updatedAt = Sys.time()
-  #                          )
-  # 
-  # con.libros.sum$insert(dt.summary)
-#   
-#   #borramos los libros del sum
-#   
-#    q <- paste0('{"title" : {"$in" :["', lista(dt.fakes$titulo, T),'"]}}')
-#    q <- paste0('{"title" : {"$in" :["', lista("aa", T),'"]}}')
-#      cat(q)
-#      a <- con.libros.sum$find(q)
-#   
-#   # Contamos los capitulos para cada uno de ellos:
-#      ids <- a$libroId
-#      id <- ids[1]
-#      q <- paste0('{"nLibro" : {"$in" :[', id,']}}')
-#      cat(q)
-#     con.libros$count(q)
-#      
-#     ns <- lapply(ids, function(id){con.libros$count(paste0('{"nLibro" : {"$in" :[', id,']}}'))})
-#     
-#     dt.fakes$id <- NULL
-#     
-#     dt.rows <- data.table(libroId = ids, nCapitulosOk = unlist(ns))
-#     
-#     me <- merge(a, dt.rows) %>% as.data.table
-#     me[, nCapitulos := nCapitulosOk]
-#     
-#     # write.csv(me %>% select(-nCapitulosOk),paste0("datos/Repair_nrows", ".csv"), row.names = F)
-#     
-# me %>% str
