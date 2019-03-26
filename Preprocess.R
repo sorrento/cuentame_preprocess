@@ -1,6 +1,5 @@
 
 # TODO --------------------------------------------------------------------
-  # fichero de config con las constraseñas y similares
   # GUardar diccionario en inglés
   # empaquetar las imagenes para Mathematica
   # hacer retomable el proceso 
