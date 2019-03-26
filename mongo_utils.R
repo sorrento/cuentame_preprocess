@@ -2,35 +2,32 @@
 
 # Librerías ---------------------------------------------------------------
   
-  library(data.table)
   library(mongolite)
-  library(dplyr)
   library(readr)
 
-
-# tips MONGODB ------------------------------------------------------------
-  # https://docs.mongodb.com/manual/reference/method/db.collection.find/
-  # https://jeroen.github.io/mongolite/query-data.html#sort-and-limit
-  
-  # dmd$find('{"cut" : "Premium"}', sort = '{"price": -1}', limit = 7)
-  # db.inventory.find( { qty: { $in: [ 5, 15 ] } } )
-  # db.inventory.find( { qty: { $in: [ 5, 15 ] } } )
-
 # Conectar ----------------------------------------------------------------
+  
+  m.conectar <- function(){
+    url.cuentame   <- "mongodb://mhalat:xxxx@ds135798.mlab.com:35798/cuentame"
+    con.libros     <- mongo(collection = "libros", url = url.cuentame)
+    con.libros.sum <- mongo(collection = "librosSum", url = url.cuentame)
+    
+    print(paste0('*** Número de libros online: ', con.libros.sum$count() - 6))
+    
+    return(list(texto = con.libros, summary = con.libros.sum))
+  } 
 
-  url.cuentame <- "mongodb://mhalat:spidey@ds135798.mlab.com:35798/cuentame"
-  con.libros <- mongo(collection = "libros", url = url.cuentame)
-  con.libros.sum <- mongo(collection = "librosSum",url = url.cuentame)
 
-  con.libros.sum$count()
-  # con.libros.sum$()
-  # con.libros$count()
+  m.ids.libres <- function(){
+    #small change
+    
+  }
 
 # Libros online -----------------------------------------------------------
   libros.sum <- con.libros.sum$find() %>% as.data.table
-
-  libros.sum[,.(title, libroId)][order(libroId)]
-
+  libros.sum[!is.na(libroId), .(title, libroId)][order(libroId)] # libroid==NA es letras de canciones
+  libros.sum[is.na(libroId)]
+  
   n.borrar <- c(5,7,14,17,22,30,53)
   n.borrar <- c(5)
 
@@ -86,10 +83,20 @@
     
     # reparamos
     
-    l.38 <- l.38[, nCapitulo :=as.numeric(nCapitulo)]
+    l.38 <- l.38[, nCapitulo := as.numeric(nCapitulo)]
     # l.38 %>% str
     
     # lo subimos
     con$insert(l.38)
   }
+  
+
+# tips MONGODB ------------------------------------------------------------
+  # https://docs.mongodb.com/manual/reference/method/db.collection.find/
+  # https://jeroen.github.io/mongolite/query-data.html#sort-and-limit
+  
+  # dmd$find('{"cut" : "Premium"}', sort = '{"price": -1}', limit = 7)
+  # db.inventory.find( { qty: { $in: [ 5, 15 ] } } )
+  # db.inventory.find( { qty: { $in: [ 5, 15 ] } } )
+
   
