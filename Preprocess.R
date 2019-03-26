@@ -19,13 +19,13 @@
   th     <- 1200 # letras maximas por cápsula
   th.min <- 500 # letras minimas por cápsula
   lang   <- "ES" #"EN"
-  
-  # path.calibre <- 'c:/Users/Milenko/Documents/Biblioteca de calibre/'
-  path.calibre <- 'c:/Users/halatm//Documents/Biblioteca de calibre/'
+  Sys.setenv(R_CONFIG_ACTIVE = "trabajo")
   
 # INIT --------------------------------------------------------------------
 
-  con <- m.conectar('spidey')
+  config <- config::get() 
+  path.calibre <- config$ruta_calibre
+  con <- m.conectar(config$pass)
   dt.summaries <- data.table()
   mathematica.remove.covers()
   i.id <- 1

@@ -1,0 +1,6 @@
+default:
+  pass: "xxx"
+  ruta_calibre: "c:/Users/Milenko/Documents/Biblioteca de calibre/"
+  
+trabajo:
+  ruta_calibre: "c:/Users/halatm//Documents/Biblioteca de calibre/"
