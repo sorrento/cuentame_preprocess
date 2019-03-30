@@ -1,9 +1,7 @@
 
 # TODO --------------------------------------------------------------------
-  # GUardar diccionario en inglés
-  # empaquetar las imagenes para Mathematica
+  # Guardar diccionario en inglés
   # hacer retomable el proceso 
-  #en diccionario, hacer relativo los números (dividir por el máximo)
 
 # LIBRERIAS -------------------------------------------------------------------
 
@@ -22,42 +20,44 @@
   
 # INIT --------------------------------------------------------------------
 
-  config <- config::get() 
+  config       <- config::get() 
   path.calibre <- config$ruta_calibre
-  con <- m.conectar(config$pass)
+  con          <- m.conectar(config$pass)
   dt.summaries <- data.table()
+  i.id         <- 1
+  
   mathematica.remove.covers()
-  i.id <- 1
+  
   # Rutas de los txts de la fecha más reciente
     rutas <- seleccion.txts(path.calibre)
 
-# BOOK SUMMARY ------------------------------------------------------------
+# BOOK SUMMARIES ------------------------------------------------------------
 
   dt.analisis <- get.fakes(rutas$path)
-   # fecha_número de libros
-      session.id <- dt.analisis$session.id
-
-  quitar <- c(6, 14, 15) # ids de los libros que no queremos incorporar
+  quitar <- c() # ids de los libros que no queremos incorporar
   
   dt.fakes <- dt.analisis$fakes[!(i %in% quitar)]
   palabras <- dt.analisis$diccionario
   
-  # actualizamos el fichero de diccionario
-    actualizar.diccionario(palabras)
+  actualizar.diccionario(palabras)
   
-  # saveRDS(dt.fakes %>% select(-texto), 
-           # paste0("datos/", session.id, ".RDS"))
+  session.id <- dt.analisis$session.id
+  saveRDS(dt.fakes %>% select(-texto),
+          paste0("datos/", session.id, ".RDS"))
+  
 
-  rm(quitar, palabras)
+  rm(quitar, palabras, dt.analisis)
   
 # BORRADO DE LIBROS ONLINE ------------------------------------------------
   
-  m.show.books(con)
-  
-  borrar <- c(24) # ids
-  m.borra.libros(con, borrar)
+  # OPCIONAL <<<<<<<
+    m.show.books(con)
     
-  rm(borrar)
+    borrar <- c() # ids
+    m.borra.libros(con, borrar)
+      
+    rm(borrar)
+  # OPCIONAL <<<<<<<
   
   ids.candidatos <- get.free.ids(con)
     
@@ -78,16 +78,16 @@
 
 # CABEZA Y COLA ------------------------------------------------------------------
 
-  dt.partes[,.(id, preview)] %>% head(39) %>% as.data.frame
+  dt.partes[,.(id, preview)] %>% head(86) %>% as.data.frame
   dt.partes[,.(id, preview)] %>% tail(50) %>% as.data.frame
   
 # AUTO CAPSULAS & INSERT --------------------------------------------------------------
   
-  mini <- 40; maxi <- 1378 #es el id
+  mini <- 48; maxi <- 1726 #es el id
   
   capsulas <- crea.capsulas(dt.partes[id >= mini & id <= maxi], id.free)
   # capsulas[,.(nCapitulo, letras, preview)]
-  # capsulas[letras >2000] %>% sample_n(1)
+  # capsulas[letras > 2000] %>% sample_n(1)
   
   dt <- capsulas %>% select(-preview, -letras, -grupo)
   
@@ -104,10 +104,7 @@
   
   dt.summaries <- rbind(dt.summaries, dt.summary)
   
-  # con.libros.sum$insert(dt.summary)
-
   dt.fakes[titulo == libro$titulo, listo := T]
-  # i.id <- i.id + 1
   
   # la foto
     pic.name <- paste0(id.free, '_', str_standar(libro$titulo), '.jpg')
@@ -133,4 +130,4 @@
   
   # setdiff(dt.fakes$titulo, dt.biblio$titulo) # estos ha cambiado el nombre porqe tiene guion, pero ya estan marcaos
   
-  # saveRDS(dt.biblio, "datos/dt.biblioteca.RDS")
+   saveRDS(dt.biblio, "datos/dt.biblioteca.RDS")

@@ -160,7 +160,7 @@
   }
   
   str_standar <- function(x){
-    iconv(x, to = 'ASCII//TRANSLIT') %>% stringr::str_replace_all(' ', '_')
+    iconv(x, to = 'ASCII//TRANSLIT') %>% stringr::str_replace_all(' |\\(|\\)', '_')
   }
       
   get.partes <- function(libro){
