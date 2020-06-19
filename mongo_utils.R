@@ -11,10 +11,11 @@
     url.cuentame   <- paste0("mongodb://mhalat:", pass, "@ds135798.mlab.com:35798/cuentame")
     con.libros     <- mongo(collection = "libros", url = url.cuentame)
     con.libros.sum <- mongo(collection = "librosSum", url = url.cuentame)
+    con.dicc       <-  mongo(collection = "diccionario", url = url.cuentame)
     
     print(paste0('*** Número de libros online: ', con.libros.sum$count() - 6))
     
-    return(list(texto = con.libros, summary = con.libros.sum))
+    return(list(texto = con.libros, summary = con.libros.sum, diccionario = con.dicc))
   } 
 
 
