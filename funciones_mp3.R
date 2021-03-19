@@ -78,7 +78,7 @@
       
       print(paste('++++++++++++++++++++++++++', s3))
       conjuro <- paste0(s00, s0, s1, s2, s3)  
-      # cat(conjuro)
+      cat(conjuro)
       
       shell(conjuro)
     }

@@ -51,12 +51,12 @@
 # BORRADO DE LIBROS ONLINE ------------------------------------------------
   
   # OPCIONAL <<<<<<<
-    m.show.books(con)
-    
-    borrar <- c() # ids
-    m.borra.libros(con, borrar)
-      
-    rm(borrar)
+    # m.show.books(con)
+    # 
+    # borrar <- c(195, 182, 152, 64, 62, 55, 34, 27) # ids
+    # m.borra.libros(con, borrar)
+    # 
+    # rm(borrar)
   # OPCIONAL <<<<<<<
   
   ids.candidatos <- get.free.ids(con)
@@ -78,12 +78,11 @@
 
 # CABEZA Y COLA ------------------------------------------------------------------
 
-  dt.partes[,.(id, preview)] %>% head(86) %>% as.data.frame
-  dt.partes[,.(id, preview)] %>% tail(50) %>% as.data.frame
+  dt.partes[,.(id, preview)] %>% head(58) %>% as.data.frame
+  dt.partes[,.(id, preview)] %>% tail(190) %>% as.data.frame
   
 # AUTO CAPSULAS & INSERT --------------------------------------------------------------
-  
-  mini <- 48; maxi <- 1726 #es el id
+  mini <- 78; maxi <- 2998 #es el id
   
   capsulas <- crea.capsulas(dt.partes[id >= mini & id <= maxi], id.free)
   # capsulas[,.(nCapitulo, letras, preview)]
@@ -92,7 +91,7 @@
   dt <- capsulas %>% select(-preview, -letras, -grupo)
   
   con$texto$insert(dt)
-  # ESTO HACERLO EN MATHEMATICA PARA PODER INCLUIR LA FOTO
+  # EL RESUMEN SE GUARDA EN UN FICHERO, QUE LUEGO LEEMOS EN MATHEMATICA
   dt.summary <- data.table(fakeAuthor = libro$fake.autor,
                            fakeTitle  = libro$fake.titulo,
                            nCapitulos = nrow(capsulas),

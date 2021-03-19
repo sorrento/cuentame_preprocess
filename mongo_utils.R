@@ -8,7 +8,9 @@
 # Conectar ----------------------------------------------------------------
   
   m.conectar <- function(pass){
-    url.cuentame   <- paste0("mongodb://mhalat:", pass, "@ds135798.mlab.com:35798/cuentame")
+    # url.cuentame   <- paste0("mongodb+srv://mhalat:", pass, "@cuentame.2tlxj.mongodb.net/cuentame?retryWrites=true&w=majority&ssl=true")
+    url.cuentame   <- paste0("mongodb+srv://mhalat:", pass, "@cuentame.2tlxj.mongodb.net/cuentame?retryWrites=false&w=majority&ssl=true")
+    # url.cuentame   <- paste0("mongodb://mhalat:", pass, "@ds135798.mlab.com:35798/cuentame")
     con.libros     <- mongo(collection = "libros", url = url.cuentame)
     con.libros.sum <- mongo(collection = "librosSum", url = url.cuentame)
     con.dicc       <-  mongo(collection = "diccionario", url = url.cuentame)
@@ -33,6 +35,7 @@
   }
   
   m.borra.libros <- function(con, ids){
+    # ids <- borrar
     # de summary
       q <- paste0('{"libroId" : {"$in" :[', lista(ids),']}}')
       con$summary$remove(q)
