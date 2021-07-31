@@ -4,17 +4,21 @@ Splitting boooks in capsules and rename title and author
 
 ## Instrucciones
 
-1. Tratamiento en __Calibre__
+0. Tengo libros listos en la carpeta `libros_cuentame`
+1. Ahí hay una carpeta con todo lo de un autor: ir borrando de allí los que coja
+2. Poner lo que voy a cargar en `_Ahora` Separar en SP y EN para hacerlo por separado
+3. Carpeta `NEXT`para los que quiero qu vayan en la próxima remesa   
+4. Tratamiento en __Calibre__
     - Importar aproximadamente 20 libros del mismo idioma a Calibre
     - Ponerle portada a los que falten
-    - Convertir a txt
-2. Recorrer el script `Preprocesos.R`
-3. Mandar la carpeta MATHEMATICA a Dropbox, para que pueda usarla el script `Covers.nb`
+    - Convertir a txt    
+5. Recorrer el script `Preprocesos.R`
+6. Mandar la carpeta MATHEMATICA a Dropbox, para que pueda usarla el script `Covers.nb`
   
 ## Función
 
 1. Convertir aproximadamente 20 libros en txt con Calibre
-2. Utilizar `Preprocess.R` para
+3. Utilizar `Preprocess.R` para
     - Generar nombres falsos de libro y autores, 
     - Separar en cápsulas de tamaño correcto
     - Subir las cápsulas a la BBDD mongo
