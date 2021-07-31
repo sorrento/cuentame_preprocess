@@ -2,9 +2,10 @@
 Splitting boooks in capsules and rename title and author
 
 ## TO DO
-    - Verificar que los libros que queremos procesar no están ya en la nube
-    - Borrar del cloud las que tienen cápsulas pero no tienen summary; mostrar qué libros son
-    - Obtnener una lista de los libros de la nube (como para mostrar en la estantería real)
+
+- Verificar que los libros que queremos procesar no están ya en la nube
+- Borrar del cloud las que tienen cápsulas pero no tienen summary; mostrar qué libros son
+- Obtnener una lista de los libros de la nube (como para mostrar en la estantería real)
 
 ## Instrucciones
 
