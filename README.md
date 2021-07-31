@@ -1,6 +1,10 @@
 # cuentame_preprocess
 Splitting boooks in capsules and rename title and author
 
+## TO DO
+    - Verificar que los libros que queremos procesar no están ya en la nube
+    - Borrar del cloud las que tienen cápsulas pero no tienen summary; mostrar qué libros son
+    - Obtnener una lista de los libros de la nube (como para mostrar en la estantería real)
 
 ## Instrucciones
 
@@ -13,7 +17,7 @@ Splitting boooks in capsules and rename title and author
     - Ponerle portada a los que falten
     - Convertir a txt    
 5. Recorrer el script `Preprocesos.R`
-6. Mandar la carpeta MATHEMATICA a Dropbox, para que pueda usarla el script `Covers.nb`
+6. Mandar la carpeta `MATHEMATICA` a Dropbox (`libros/cuentame/MATHEMATICA/`), para que pueda usarla el script `Covers.nb`
   
 ## Función
 
@@ -22,7 +26,7 @@ Splitting boooks in capsules and rename title and author
     - Generar nombres falsos de libro y autores, 
     - Separar en cápsulas de tamaño correcto
     - Subir las cápsulas a la BBDD mongo
-    - Genera una carpeta MATHEMATICA con los ficheros de los covers y el summary para ser insertado con Mathematica (JSON) porque sino no se coge la imagen
+    - Genera una carpeta `MATHEMATICA` con los ficheros de los covers y el summary para ser insertado con Mathematica (JSON) porque sino no se coge la imagen
 
 Mathematica procesa la imagen (`Covers.nb`)
 
