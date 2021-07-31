@@ -44,8 +44,8 @@ Mathematica procesa la imagen (`Covers.nb`)
 
 ## Datos:
 - Dashboard back4app:
-  - https://www.back4app.com/
+  - https://www.back4app.com/ (slow to charge dashboard)
   - milenko@halat.cl
-- mlab: 
-  - https://mlab.com/ [closed, ahora Atlas mongodb]
+- BBDD: 
+  - https://www.mongodb.com/es/cloud/atlas (google account access) (https://mlab.com/, is obsolete)
   
