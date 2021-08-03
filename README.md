@@ -1,24 +1,33 @@
 # cuentame_preprocess
 Splitting boooks in capsules and rename title and author
 
+## TO DO
+
+- Verificar que los libros que queremos procesar no están ya en la nube
+- Borrar del cloud las que tienen cápsulas pero no tienen summary; mostrar qué libros son
+- Obtnener una lista de los libros de la nube (como para mostrar en la estantería real)
 
 ## Instrucciones
 
-1. Tratamiento en __Calibre__
+0. Tengo libros listos en la carpeta `libros_cuentame`
+1. Ahí hay una carpeta con todo lo de un autor: ir borrando de allí los que coja
+2. Poner lo que voy a cargar en `_Ahora` Separar en SP y EN para hacerlo por separado
+3. Carpeta `NEXT`para los que quiero qu vayan en la próxima remesa   
+4. Tratamiento en __Calibre__
     - Importar aproximadamente 20 libros del mismo idioma a Calibre
     - Ponerle portada a los que falten
-    - Convertir a txt
-2. Recorrer el script `Preprocesos.R`
-3. Mandar la carpeta MATHEMATICA a Dropbox, para que pueda usarla el script `Covers.nb`
+    - Convertir a txt    
+5. Recorrer el script `Preprocesos.R`
+6. Mandar la carpeta `MATHEMATICA` a Dropbox (`libros/cuentame/MATHEMATICA/`), para que pueda usarla el script `Covers.nb`
   
 ## Función
 
 1. Convertir aproximadamente 20 libros en txt con Calibre
-2. Utilizar `Preprocess.R` para
+3. Utilizar `Preprocess.R` para
     - Generar nombres falsos de libro y autores, 
     - Separar en cápsulas de tamaño correcto
     - Subir las cápsulas a la BBDD mongo
-    - Genera una carpeta MATHEMATICA con los ficheros de los covers y el summary para ser insertado con Mathematica (JSON) porque sino no se coge la imagen
+    - Genera una carpeta `MATHEMATICA` con los ficheros de los covers y el summary para ser insertado con Mathematica (JSON) porque sino no se coge la imagen
 
 Mathematica procesa la imagen (`Covers.nb`)
 
@@ -40,8 +49,8 @@ Mathematica procesa la imagen (`Covers.nb`)
 
 ## Datos:
 - Dashboard back4app:
-  - https://www.back4app.com/
+  - https://www.back4app.com/ (slow to charge dashboard)
   - milenko@halat.cl
-- mlab: 
-  - https://mlab.com/ [closed, ahora Atlas mongodb]
+- BBDD: 
+  - https://www.mongodb.com/es/cloud/atlas (google account access) (https://mlab.com/, is obsolete)
   
