@@ -26,11 +26,11 @@
   dt.summaries <- data.table()
   i.id         <- 1
   
-  mathematica.remove.covers()
+  # mathematica.remove.covers()
   
   # Rutas de los txts de la fecha más reciente
     rutas <- seleccion.txts(path.calibre)
-
+  
 # BOOK SUMMARIES ------------------------------------------------------------
 
   dt.analisis <- get.fakes(rutas$path)
@@ -53,7 +53,7 @@
   # OPCIONAL <<<<<<<
     # m.show.books(con)
     # 
-    # borrar <- c(195, 182, 152, 64, 62, 55, 34, 27) # ids
+    # borrar <- c() # ids
     # m.borra.libros(con, borrar)
     # 
     # rm(borrar)
@@ -64,7 +64,7 @@
   if(!exists('dt.fakes')){
     print('**ERROR no está cargado del fichero de sumary (dt.fakes)')
   }
-# AUTO DIVISION FULL----------------------------------------------------------------
+#### INI_REPETIR AUTO DIVISION FULL----------------------------------------------------------------
   
   cat('\14')
   id.free <- ids.candidatos[i.id]
@@ -72,17 +72,18 @@
   # selección de libro
     print(paste("queda por procesar", dt.fakes[listo == F] %>% nrow))
     libro <- dt.fakes[listo == F] %>% sample_n(1)
+    #TODO verificar si el libro lo hemos procesado ya, comparando con el archivo en que lo reviso
     print(paste("vamos con:", libro$titulo, "| id_libro = ", id.free))
 
     dt.partes <- get.partes(libro)
 
 # CABEZA Y COLA ------------------------------------------------------------------
 
-  dt.partes[,.(id, preview)] %>% head(58) %>% as.data.frame
-  dt.partes[,.(id, preview)] %>% tail(190) %>% as.data.frame
+  cat('\14');dt.partes[,.(id, preview)] %>% head(90) %>% as.data.frame 
+  cat('\14');dt.partes[,.(id, preview)] %>% tail(290) %>% as.data.frame
   
 # AUTO CAPSULAS & INSERT --------------------------------------------------------------
-  mini <- 78; maxi <- 2998 #es el id
+  mini <- 29; maxi <- 4547 #es el id
   
   capsulas <- crea.capsulas(dt.partes[id >= mini & id <= maxi], id.free)
   # capsulas[,.(nCapitulo, letras, preview)]
@@ -114,7 +115,7 @@
   
   i.id <- i.id + 1
   
-# FINALLY, PARA SUMMARY MATHEMATICA ------------------------------------------------
+#### END REPETIR FINALLY, PARA SUMMARY MATHEMATICA ------------------------------------------------
   
   write.csv(dt.summaries[,.(libroId, fakeAuthor, fakeTitle, nCapitulos, author, title, idioma)], 
             paste0("MATHEMATICA/summaries.csv"), row.names = F)
@@ -124,7 +125,7 @@
   dt.biblio <- readRDS("datos/dt.biblioteca.RDS")
   # veamos si hacen match
   # algunos estan dos veces, otros no estan
-  # (a <- dt.biblio[titulo %in% dt.fakes$titulo])
+   (a <- dt.biblio[titulo %in% dt.fakes$titulo])
   dt.biblio[titulo %in% dt.fakes$titulo, leido := 1] # marcamos los duplicados
   
   # setdiff(dt.fakes$titulo, dt.biblio$titulo) # estos ha cambiado el nombre porqe tiene guion, pero ya estan marcaos
